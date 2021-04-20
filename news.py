@@ -26,6 +26,11 @@ post_pwd = '***'
 post_clear_default_lines = 10
 post_line_max_width = 50
 
+post_condition = {
+    'double_connect': './asset/double_connection.png',
+    'article_exists': './asset/article_exists.png'
+}
+
 
 def get_digit_list(s_in):
     s_temp = ''
@@ -146,18 +151,40 @@ def post_switch(board_order, post_type):
     # Enter Site Address
     pyautogui.typewrite(post_site)
     pyautogui.press('enter')
-    sleep(1)
+    sleep(5)
 
     # Enter User Name
     pyautogui.typewrite(post_user)
     pyautogui.press('enter')
-    sleep(1)
+    sleep(3)
 
     # Enter User Password
     pyautogui.typewrite(post_pwd)
     pyautogui.press('enter')
+    sleep(3)
+
+    # Check if double connection
+    try:
+        pyautogui.locateOnScreen(post_condition['double_connect'], confidence=0.9)
+        pyautogui.typewrite('y')
+        sleep(1)
+        pyautogui.press('enter')
+        sleep(10)
+    except ImageNotFoundException:
+        pass
+
     pyautogui.press('enter')
-    sleep(1)
+    sleep(5)
+
+    # Check if article exists
+    try:
+        pyautogui.locateOnScreen(post_condition['article_exists'], confidence=0.9)
+        pyautogui.typewrite('Q')
+        sleep(1)
+        pyautogui.press('enter')
+        sleep(10)
+    except ImageNotFoundException:
+        pass
 
     # Switch to favorite
     pyautogui.press('f')
@@ -228,6 +255,7 @@ def fake_typewriter():
             pyautogui.keyDown('p')
             pyautogui.keyUp('p')
             pyautogui.keyUp('alt')
+
             try:
                 c_cnt += len(c.encode('Big5'))
             except UnicodeEncodeError:
@@ -251,6 +279,7 @@ def fake_typewriter():
     # Exit Application
     x, y = pyautogui.size()
     pyautogui.click(x=x-5, y=5)
+    pyautogui.press('enter')
 
 
 if __name__ == '__main__':
@@ -258,7 +287,7 @@ if __name__ == '__main__':
     while True:
         if news_search():
             if news_copy():
-                # post_switch('3', '5')
-                post_switch('6', '1')  # Test board
+                post_switch('3', '5')
+                # post_switch('6', '1')  # Test board
                 fake_typewriter()
         sleep(600)
