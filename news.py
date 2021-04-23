@@ -7,6 +7,7 @@ import win32gui
 import win32con
 from time import sleep
 from news_crawler1 import NewsCrawler1
+from news_crawler2 import NewsCrawler2
 
 test_file = 'news.txt'
 
@@ -59,45 +60,29 @@ def post_switch(crawler):
     sleep(2)
 
     # Check if double connection
-    """
-        try:
-        pyautogui.locateOnScreen(post_condition['double_connect'], confidence=0.9)
-        pyautogui.locateOnScreen(post_condition['double_connect'], confidence=0.9)
-        pyautogui.locateOnScreen(post_condition['double_connect'], confidence=0.9)
-        pyautogui.locateOnScreen(post_condition['double_connect'], confidence=0.9)
-        pyautogui.locateOnScreen(post_condition['double_connect'], confidence=0.9)
-
-        pyautogui.typewrite('y')
-        sleep(1)
-        pyautogui.press('enter')
-        print('double_connect')
-    except:
-        print('normal_connect')
-        pass
-    """
-
-
+    pyautogui.typewrite('y')
+    sleep(1)
+    pyautogui.press('enter')
     sleep(5)
+
     pyautogui.press('enter')
     sleep(5)
 
     # Check if article exists
     """
-    try:
-        pyautogui.locateOnScreen(post_condition['article_exists'], confidence=0.9)
-
-        pyautogui.typewrite('Q')
-        sleep(1)
-        pyautogui.press('enter')
-        sleep(5)
-        print('article_exists')
-    except:
-        print('normal_article_status')
-        pass
+    pyautogui.typewrite('Q')
+    sleep(1)
+    pyautogui.press('enter')
+    sleep(5)
     """
 
     # Switch to favorite
-    sleep(2)
+    pyautogui.press('left')
+    sleep(1)
+    pyautogui.press('left')
+    sleep(1)
+    pyautogui.press('left')
+    sleep(1)
     pyautogui.typewrite('F')
     sleep(2)
     pyautogui.press('enter')
@@ -109,8 +94,10 @@ def post_switch(crawler):
     sleep(2)
     pyautogui.press('enter')
     sleep(2)
-    pyautogui.press('enter')
-    sleep(2)
+
+    if crawler.skip_board_entry:
+        pyautogui.press('enter')
+        sleep(2)
 
     # New Post
     pyautogui.keyDown('ctrl')
@@ -125,8 +112,9 @@ def post_switch(crawler):
     pyautogui.press('enter')
     sleep(2)
 
-    # Select Post Type
+    # Copy News Title
     pyperclip.copy(crawler.news_title)
+    sleep(1)
     pyautogui.keyDown('alt')
     pyautogui.keyDown('p')
     pyautogui.keyUp('p')
@@ -155,12 +143,9 @@ def fake_typewriter(crawler):
 
     pyautogui.typewrite(f'\n News Reference: \n {crawler.news_link} \n \n ')
 
-    c_cnt = 0
-
     for c in crawler.news_article:
         if c == '\n':
             pyautogui.press('enter')
-            c_cnt = 0
             pass
         elif not c:
             break
@@ -170,16 +155,6 @@ def fake_typewriter(crawler):
             pyautogui.keyDown('p')
             pyautogui.keyUp('p')
             pyautogui.keyUp('alt')
-
-            """
-            try:
-                c_cnt += len(c.encode('Big5'))
-            except UnicodeEncodeError:
-                c_cnt += 1
-            if c_cnt >= post_line_max_width:
-                pyautogui.press('enter')
-                c_cnt = 0
-            """
 
             sleep(1.5)
 
@@ -202,11 +177,13 @@ def fake_typewriter(crawler):
 
 if __name__ == '__main__':
 
-    news_seekers.append(NewsCrawler1('3', '5'))
+    news_seekers.append(NewsCrawler1('1', '5', True))
+    news_seekers.append(NewsCrawler2('2', '3', False))
 
     while True:
         for seekers in news_seekers:
             if seekers.search() and seekers.copy():
+                pass
                 post_switch(seekers)
                 fake_typewriter(seekers)
         sleep(600)
